@@ -1,0 +1,4 @@
+{
+  "admin_commands": ["sudo"],
+  "normal_commands": []
+}
