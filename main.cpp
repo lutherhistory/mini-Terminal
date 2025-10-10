@@ -1,30 +1,13 @@
-#include "include/System.hpp"
-#include "include/Terminal.hpp"
-
 #include <iostream>
-// #include <fstream>
+#include "include/System.hpp"
 
 using namespace std;
 
-int main() {
-    Terminal terminal;
-    System program;
-    std::string command;
+int main(){
+    string command;
+    bool running = true;
 
-    do {
-        program.renderPath();
-        cin >> command;
+    System os;
 
-        terminal.set(command);
-
-        if (command != "exit")
-            terminal.response();
-        else {
-            cout << "\033[0m";
-            return 0;
-        }
-
-    } while (true);
-
-    return 1;
+    return 0;
 }

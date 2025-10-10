@@ -1,84 +1,63 @@
 #include "../include/System.hpp"
-
 #include <iostream>
-#include <string>
 
-void System::renderPath(){
-    std::cout << "\033[38;2;0;255;180m" << user << "\033[0m"
-              << "\033[37m@"
-              << "\033[38;2;255;200;0mmini-Terminal\033[0m"
-              << "\033[37m:"
-              << "\033[38;2;0;200;255m " << "~" + path << "\033[0m"
-              << "\033[97m$ ";
+void System::signUpUser(){
+    std::string name, password;
+
+    id++;
+
+    std::cout << color("> Username: ", "1;33");
+    std::cin >> name;
+    std::cout << color("> Password: ", "1;33");
+    std::cin >> password;
+
+    data.save({"machine", "using_id"}, id);
+
+    data.append({"users"}, {
+        {"current_dir", "/home/" + name},
+        {"history_file", name + ".history"},
+        {"home_dir", "/home/" + name},
+        {"id", id},
+        {"is_admin", false},
+        {"name", name},
+        {"password_hash", password},
+        {"theme", {}}
+    });
 }
 
-void System::set(){
-    file.open(file_name, std::ios::in);
-    std::string line, str;
+void System::verifyLogin(){
+    std::string name, password;
 
-    if (!file.is_open()){
-        std::cerr << "Failed to open the source: " << file_name << std::endl;
-        return;
-    }
+    login:
+    std::cout << color("Login as: ", "1;34");
+    std::cin >> name;
 
-    while (getline(file, line)){
-        str += line;
-    }
-
-    file.close();
-
-    data = data.parse(str);
-    user = data["user"];
-    password = data["password"];
-    path = data["path"];
-}
-
-void System::update(){
-    file.open(file_name, std::ios::out);
-
-    if (!file.is_open()){
-        std::cerr << "Failed to open the source: " << file_name << std::endl;
-        return;
-    }
-
-    data = {
-        {"user", user},
-        {"password", password},
-        {"path", path}
-    };
-
-    file << data.dump(4);
-
-    file.close();
-}
-
-void System::get(std::string text){
-    if (text == "path"){
-        std::cout << "home/" << user;
-
-        if (!path.empty())
-            std::cout << '/' << path;
-
-        std::cout << std::endl;
-    }else if (text == "user"){
-        std::cout << user << std::endl;
+    for (int count = 0; count < data.value({"machine", "user_count"}); count++){
+        if (name == data.value({"users", std::to_string(count), "name"})){
+            std::cout << color("Password for " + name +": ", "1;31");
+            std::cin >> password;
+        }else {
+            goto login;
+        }
     }
 }
 
-System::System(){
-    set();
+void System::deleteUser(){
 
-    if (user.empty() && password.empty()){
-        std::cout << "Enter your user name: ";
-        std::cin >> user;
+}
 
-        std::string file_n = "mkdir ../back-end/home/" + user;
+std::string System::color(const std::string& text, const std::string& code){
+    return "\033[" + code + "m" + text + "\033[0m";
+}
 
-        system(file_n.c_str());
+System::System(): data("../settings/system.json"){
+    raw_data = data.exportString();
+    id = data.value({"machine", "using_id"});
 
-        std::cout << "Enter your password: ";
-        std::cin >> password;
+    if (id == 0){
+        signUpUser();
+
+    }else {
+        verifyLogin();
     }
-
-    update();
 }

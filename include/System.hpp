@@ -1,29 +1,25 @@
 #pragma once
 
+#include "JSON.hpp"
 #include <string>
-#include <fstream>
 #include <termios.h>
 #include <unistd.h>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 
 class System {
-    private:
-        std::string user="user", path="~", password;
-        std::string file_name = "/home/luther/Workspace/mini-Terminal/resource/system.json";
-        std::fstream file;
-        json data = {
-            {"user", "user"},
-            {"password", ""},
-            {"path", ""}
-        };
+private:
+    int id = 0;
+    std::string raw_data;
 
-    public:
-        void renderPath();
-        void set();
-        void get(std::string);
-        void update();
+    JSON data;
 
-        System();
+public:
+    void signUpUser();
+
+    void verifyLogin();
+
+    void deleteUser();
+
+    std::string color(const std::string& text, const std::string& code);
+
+    System();
 };
