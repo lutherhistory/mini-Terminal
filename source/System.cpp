@@ -1,24 +1,30 @@
 #include "../include/System.hpp"
+#include "../include/Color.hpp"
+
 #include <iostream>
 #include <string>
 #include <termios.h>
 #include <unistd.h>
+
+int System::giveUsingID(){
+    return data.value({"machine", "using_id"});
+}
 
 void System::signUpUser(){
     std::string name, password, confirm, re = " ";
 
     using_id++, user_count++;
 
-    std::cout << color("> Username: ", "1;33");
+    std::cout << Color::color("> Username: ", "1;33");
     std::cin >> name;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     password:
-    std::cout << color(">" + re + "Password: ", "1;33");
+    std::cout << Color::color(">" + re + "Password: ", "1;33");
     password = inputPassword();
 
-    std::cout << color("> Confirm Password: ", "1;33");
+    std::cout << Color::color("> Confirm Password: ", "1;33");
     confirm = inputPassword();
 
     if (password != confirm){
@@ -41,40 +47,43 @@ void System::signUpUser(){
     });
 }
 
-void System::verifyLogin(){
+void System::verifyLogin() {
     std::string name, password;
-    int count, not_found = 0;
 
-    login_username:
-    std::cout << color("Login as: ", "1;34");
-    std::cin >> name;
+    while (true) { // keep asking username
+        std::cout << Color::color("Login as: ", "1;34");
+        std::cin >> name;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        int user_count = data.value({"machine", "user_count"});
+        bool user_found = false;
 
-    for (count = 1; count <= data.value({"machine", "user_count"}); count++){
-        if (name == data.value({"users", std::to_string(count - 1), "name"})){
-            login_password:
-            std::cout << color("Password for " + name + ": ", "1;31");
-            password = inputPassword();
+        for (int count = 0; count < user_count; count++) {
+            std::string index = std::to_string(count);
+            std::string stored_name = data.value({"users", index, "name"});
 
-            if (password == data.value({"users", std::to_string(count - 1), "password_hash"})){
-                std::cout << "Welcome back " << name << std::endl;
-                data.save({"machine", "using_id"}, count - 1);
-                not_found = 0;
-                break;
-            }else {
-                std::cout << color("Sorry try again", "33") << std::endl;
-                goto login_password;
+            if (name == stored_name) {
+                user_found = true;
+
+                // Password loop
+                while (true) {
+                    std::cout << Color::color("Password for " + name + ": ", "1;31");
+                    password = inputPassword();
+
+                    std::string stored_pass = data.value({"users", index, "password_hash"});
+                    if (password == stored_pass) {
+                        data.save({"machine", "using_id"}, count);
+                        return; // login successful
+                    } else {
+                        std::cout << Color::color("Sorry try again", "33") << std::endl;
+                    }
+                }
             }
-        }else {
-            not_found++;
-            continue;
         }
-    }
 
-    if (not_found == data.value({"machine", "user_count"})){
-        std::cout << color("Can't find user: " + name, "33") << std::endl;
-        goto login_username;
+        if (!user_found) {
+            std::cout << Color::color("Can't find user: " + name, "33") << std::endl;
+        }
     }
 }
 
@@ -96,7 +105,7 @@ void System::deleteUser(std::string name){
     }
 
     if (not_found == data.value({"machine", "user_count"})){
-        std::cout << color("Can't find user: " + name, "33") << std::endl;
+        std::cout << Color::color("Can't find user: " + name, "33") << std::endl;
     }
 }
 
@@ -136,10 +145,6 @@ std::string System::inputPassword() {
         // Restore terminal
         tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
         return password;
-}
-
-std::string System::color(const std::string& text, const std::string& code){
-    return "\033[" + code + "m" + text + "\033[0m";
 }
 
 System::System(): data("../settings/system.json"){

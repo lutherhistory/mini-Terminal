@@ -6,11 +6,14 @@
 class System {
 private:
     int using_id = 0, user_count = 0;
+    bool permission = false;
     std::string raw_data;
 
     JSON data;
 
 public:
+    int giveUsingID();
+
     void signUpUser();
 
     void verifyLogin();
@@ -18,8 +21,6 @@ public:
     void deleteUser(std::string);
 
     std::string inputPassword();
-
-    std::string color(const std::string&, const std::string&);
 
     System();
 };
