@@ -2,12 +2,10 @@
 
 #include "JSON.hpp"
 #include <string>
-#include <termios.h>
-#include <unistd.h>
 
 class System {
 private:
-    int id = 0;
+    int using_id = 0, user_count = 0;
     std::string raw_data;
 
     JSON data;
@@ -17,9 +15,11 @@ public:
 
     void verifyLogin();
 
-    void deleteUser();
+    void deleteUser(std::string);
 
-    std::string color(const std::string& text, const std::string& code);
+    std::string inputPassword();
+
+    std::string color(const std::string&, const std::string&);
 
     System();
 };
