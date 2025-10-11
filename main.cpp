@@ -2,27 +2,40 @@
 
 #include "include/System.hpp"
 #include "include/User.hpp"
+#include "include/Terminal.hpp"
 // #include "include/Color.hpp"
 
 using namespace std;
 
 int main(){
-    std::cout << "\033[1;37mWhite text\033[0m" << std::endl; // bright white
-    std::cout << "\033[1;33mBright yellow\033[0m" << std::endl; // bright yellow
-
     string command;
     bool running = true;
 
-    cout << "\033[37m";
-
     System os;
     User user(os.giveUsingID());
+    Terminal console;
+    system("clear");
 
-    // system("clear");
+    cout << "Welcome to mini-Terminal, the best terminal emulator for Any OS!" << endl;
+    cout << "Have fun learning and testing!" << endl;
+    cout << "If you need to \'help \', type help for commands" << endl;
+    cout << "or you want to report a bug and give feedback, " << endl;
+    cout << "github: https://github.com/lutherhistory/mini-Terminal, telegram channel: https://t.me/LHProgramming";
+    cout << endl << endl;
 
-    cout << "Welcome to the mini-Terminal!" << "\n\n";
-    user.consoleInterface();
-    cin >> command;
+    do {
+        user.consoleInterface();
+        cin >> command;
+
+        console.set(command);
+
+        if(command == "exit"){
+            running = false;
+            break;
+        }else {
+            console.response();
+        }
+    } while (running);
 
     return 0;
 }
