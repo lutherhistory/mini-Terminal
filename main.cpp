@@ -2,6 +2,7 @@
 
 #include "include/System.hpp"
 #include "include/User.hpp"
+#include "include/Terminal.hpp"
 // #include "include/Color.hpp"
 
 using namespace std;
@@ -10,10 +11,9 @@ int main(){
     string command;
     bool running = true;
 
-    cout << "\033[37m";
-
     System os;
     User user(os.giveUsingID());
+    Terminal console;
     system("clear");
 
     cout << "Welcome to mini-Terminal, the best terminal emulator for Any OS!" << endl;
@@ -27,11 +27,13 @@ int main(){
         user.consoleInterface();
         cin >> command;
 
+        console.set(command);
+
         if(command == "exit"){
             running = false;
             break;
         }else {
-
+            console.response();
         }
     } while (running);
 

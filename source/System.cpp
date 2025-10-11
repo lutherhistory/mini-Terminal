@@ -15,16 +15,16 @@ void System::signUpUser(){
 
     using_id++, user_count++;
 
-    std::cout << color::picker("> Username: ", "1;33");
+    std::cout << color::pick("> Username: ", "1;33");
     std::cin >> name;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     password:
-    std::cout << color::picker(">" + re + "Password: ", "1;33");
+    std::cout << color::pick(">" + re + "Password: ", "1;33");
     password = inputPassword();
 
-    std::cout << color::picker("> Confirm Password: ", "1;33");
+    std::cout << color::pick("> Confirm Password: ", "1;33");
     confirm = inputPassword();
 
     if (password != confirm){
@@ -51,7 +51,7 @@ void System::verifyLogin() {
     std::string name, password;
 
     while (true) { // keep asking username
-        std::cout << color::picker("Login as: ", "1;34");
+        std::cout << color::pick("Login as: ", "1;34");
         std::cin >> name;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
@@ -67,7 +67,7 @@ void System::verifyLogin() {
 
                 // Password loop
                 while (true) {
-                    std::cout << color::picker("Password for " + name + ": ", "1;31");
+                    std::cout << color::pick("Password for " + name + ": ", "1;31");
                     password = inputPassword();
 
                     std::string stored_pass = data.value({"users", index, "password_hash"});
@@ -75,14 +75,14 @@ void System::verifyLogin() {
                         data.save({"machine", "using_id"}, count);
                         return; // login successful
                     } else {
-                        std::cout << color::picker("Sorry try again", "33") << std::endl;
+                        std::cout << color::pick("Sorry try again", "33") << std::endl;
                     }
                 }
             }
         }
 
         if (!user_found) {
-            std::cout << color::picker("Can't find user: " + name, "33") << std::endl;
+            std::cout << color::pick("Can't find user: " + name, "33") << std::endl;
         }
     }
 }
@@ -105,7 +105,7 @@ void System::deleteUser(std::string name){
     }
 
     if (not_found == data.value({"machine", "user_count"})){
-        std::cout << color::picker("Can't find user: " + name, "33") << std::endl;
+        std::cout << color::pick("Can't find user: " + name, "33") << std::endl;
     }
 }
 

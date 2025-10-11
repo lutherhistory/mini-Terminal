@@ -19,17 +19,17 @@
         "shell": "mini-Shell",
         "user_count": 1,
         "using_id": 0,
-        "version": "1.0.0"
+        "version": "1.0"
     },
     "users": [
         {
-            "current_dir": "/home/luth",
-            "history_file": "luth.history",
-            "home_dir": "/home/luth",
+            "current_dir": "/home/luther",
+            "history_file": "luther.history",
+            "home_dir": "/home/luther",
             "id": 0,
             "is_admin": false,
-            "name": "luth",
-            "password_hash": "hello",
+            "name": "luther",
+            "password_hash": "helloworldinblahblah",
             "theme": null
         }
     ]
