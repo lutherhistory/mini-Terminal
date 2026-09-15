@@ -1,3 +1,6 @@
-# mini Terminal Shell
+# mini Shell
 
-> ...
+```
+type: cli
+status: paused
+```
