@@ -1,16 +1,18 @@
 // C standard headers
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
 
 // C++ standards headers
 #include <iostream>
-#include <fstream>
 #include <vector>
 
 // POSIX headers
 #include <sys/wait.h>
+#include <sys/file.h>
 #include <unistd.h>
+
 
 auto tokenizer(char* data) 
 {
@@ -28,20 +30,19 @@ auto tokenizer(char* data)
 }
 
 // @return status.
-//	[-1] something has wrong
-// 	[ 0] nothing
-// 	[ 1] succeed
+//	-1: if something has wrong
+// 	 0: if nothing
+// 	 1: if succeed
 auto handle_redirect(std::vector<char*>& args)
 {
 	for (int i=0; args[i] != nullptr; i++) 
 	{
-		if (std::strcmp(args[i], ">") == 0) 
+		if (std::string(args[i]) == ">") 
 		{
-			if (std::freopen(args[i+1], "w", stdout) == nullptr)
+			if (!std::freopen(args[i+1], "w", stdout))
 				return -1;
 
 			args[i] = nullptr;
-
 			return 1;
 		}
 	}
@@ -63,7 +64,7 @@ void process(std::string& buf, int& status)
 {
 	auto args 	= tokenizer(buf.data());
 
-	if (std::strcmp(args[0], "exit") == 0)
+	if (std::string(args[0]) == "exit")
 		exit(EXIT_SUCCESS);
 
 	auto pid 	= fork();
@@ -78,8 +79,8 @@ void process(std::string& buf, int& status)
 	else if (pid == 0) 
 	{
 		if (handle_redirect(args) < 0) {
-			std::cerr << "Could not redirect" << std::endl;
-			exit(1);
+			std::cerr << "mish: Could not redirect" << std::endl;
+			_exit(1);
 		}
 
 		// I'm the child.
@@ -109,7 +110,9 @@ int main(int argc, char **argv)
 	while (true){
 		std::string buf;
 		
-		std::cout << "$ ";
+		std::cout
+			<< "~" 
+			<< "$ ";
 		std::getline(std::cin, buf, '\n');
 	
 		if (can_parse(buf))
