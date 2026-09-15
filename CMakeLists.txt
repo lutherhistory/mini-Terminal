@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(mini_term)
+project(mish)
 
 set(CMAKE_CXX_STANDARD 17)
 
