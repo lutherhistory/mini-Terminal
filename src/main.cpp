@@ -5,24 +5,20 @@
 
 // C++ standards headers
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 // POSIX headers
 #include <sys/wait.h>
 #include <unistd.h>
 
-auto tokenizer(char* data) {
+auto tokenizer(char* data) 
+{
 	std::vector<char*> args;
-
 	char *token = std::strtok(data, " ");
 
 	while (token != nullptr) {
 		args.push_back(token);
-		
-		if (std::strcmp(args[0], "exit") == 0) {
-
-			exit(0);
-		}
 
 		token = std::strtok(nullptr, " ");
 	}
@@ -31,11 +27,27 @@ auto tokenizer(char* data) {
 	return args;
 }
 
-// auto handle_redirect(std::vector<char*>& args)
-// {
+// @return status.
+//	[-1] something has wrong
+// 	[ 0] nothing
+// 	[ 1] succeed
+auto handle_redirect(std::vector<char*>& args)
+{
+	for (int i=0; args[i] != nullptr; i++) 
+	{
+		if (std::strcmp(args[i], ">") == 0) 
+		{
+			if (std::freopen(args[i+1], "w", stdout) == nullptr)
+				return -1;
 
-// 	return 0;
-// }
+			args[i] = nullptr;
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
 
 bool can_parse(std::string& buf)
 {	
@@ -49,9 +61,12 @@ bool can_parse(std::string& buf)
 
 void process(std::string& buf, int& status)
 {
-	auto args 	= tokenizer(buf.data());		
-	auto pid 	= fork();
+	auto args 	= tokenizer(buf.data());
 
+	if (std::strcmp(args[0], "exit") == 0)
+		exit(EXIT_SUCCESS);
+
+	auto pid 	= fork();
 
 	if (pid < 0) 
 	{
@@ -62,6 +77,11 @@ void process(std::string& buf, int& status)
 
 	else if (pid == 0) 
 	{
+		if (handle_redirect(args) < 0) {
+			std::cerr << "Could not redirect" << std::endl;
+			exit(1);
+		}
+
 		// I'm the child.
 		if (execvp(args[0], args.data())) {
 			std::cerr 
